@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:auto_animated/auto_animated.dart';
+import 'package:binnazirfoundation/components/api.dart';
 import 'package:flutter/material.dart';
 
 import 'common.dart';
@@ -18,6 +19,11 @@ const kgreybg= Color(0xFF4B484B);
 const kredcolor = Colors.red;
 var kyellow = Colors.yellow.shade800;
 var scafKey = GlobalKey<ScaffoldState>();
+const URL = "https://nazircare.com/mrzulf/api/";
+const imageURL = "https://nazircare.com/causes/";
+var allapi = AllApi();
+
+
 
 final options = LiveOptions(
   // Start animation after (default zero)

@@ -4,7 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CategoryPage extends StatefulWidget {
-  const CategoryPage({Key key}) : super(key: key);
+  final String catid;
+  const CategoryPage({Key key, this.catid}) : super(key: key);
 
   @override
   _CategoryPageState createState() => _CategoryPageState();

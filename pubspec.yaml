@@ -49,6 +49,8 @@ dependencies:
   regexpattern: ^2.0.1
   auto_animated: ^3.0.0
   fluttertoast: ^8.0.8
+  firebase_messaging: ^11.2.3
+  php_serializer: ^0.3.2
 
 dev_dependencies:
   flutter_test:

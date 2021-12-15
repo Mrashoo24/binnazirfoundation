@@ -48,7 +48,7 @@ class _LoginState extends State<Login> {
                   children: [
                     Container(
                       height: Get.height * 0.3 ,
-                      child: Image.asset("assets/logo.webp"),
+                      child: FadeInImage(placeholder: AssetImage("assets/logo.webp"), image: AssetImage("assets/logo.webp"))
                     ),
                     Text("NAZIR FOUNDATION",style: TextStyle(color: kgreybg,fontSize: 22,fontWeight: FontWeight.w700),)
                   ],

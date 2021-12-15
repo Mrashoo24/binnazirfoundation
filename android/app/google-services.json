@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "159213689994",
+    "project_id": "binnazirfoundation",
+    "storage_bucket": "binnazirfoundation.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159213689994:android:a9ea0760442f947bfc6173",
+        "android_client_info": {
+          "package_name": "com.an.binnazir.binnazirfoundation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159213689994-8bf9osvnq9fs969hg8uf39l5ookf5pgr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.an.binnazir.binnazirfoundation",
+            "certificate_hash": "8f7c6d033125fcae5173c31e4a1d88fe088f0d68"
+          }
+        },
+        {
+          "client_id": "159213689994-n8gcgtlke4n40dhg8vbfmtes8170nk6p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfrRoFrRR1jC05lI0wZBgROmC4rbEBkfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159213689994-n8gcgtlke4n40dhg8vbfmtes8170nk6p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

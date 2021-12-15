@@ -2,8 +2,10 @@
 import 'package:auto_animated/auto_animated.dart';
 import 'package:binnazirfoundation/components/common.dart';
 import 'package:binnazirfoundation/components/constants.dart';
+import 'package:binnazirfoundation/components/model.dart';
 import 'package:binnazirfoundation/screens/cases/cases.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
@@ -22,124 +24,149 @@ class Explore extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    allapi.getUrgentCases();
+
+
+
     return SafeArea(
       child: SingleChildScrollView(
         child: Padding(
           padding:  EdgeInsets.all(kscafpadding),
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: Get.height*0.16,
-                child: Column(
+          child: FutureBuilder(
+            future: Future.wait([allapi.getUrgentCases(),  allapi.getCategory()]),
+            builder: (context, snapshot) {
 
-                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                  children: <Widget>[
+              if(!snapshot.hasData){
 
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Icon(LineAwesomeIcons.search,
-                      color: kred,
-                      size: 30,),
-                    ),
+                return Center(child:Image.asset("assets/preloader.png",width: 100,height: 100,));
 
-                    Text(
-                      "Explore",
-                       style: TextStyle(
-                                color: kred,
-                                fontSize: 35,
-                                fontFamily: 'CentraleSansRegular'),
-                    ),
+              }
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              if(snapshot.hasError){
+
+                Fluttertoast.showToast(msg: "Something Went Wrong ");
+
+              }
+
+              List<UrgentCasesModel>  urgentcaselist= snapshot.requireData[0] ;
+              List<CategoryModel>  catlist= snapshot.requireData[1] ;
+
+              return Column(
+                children: <Widget>[
+                  Container(
+                    height: Get.height*0.16,
+                    child: Column(
+
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
                       children: <Widget>[
-                    Text(
-                      "Categories",
-                       style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 32,
-                                fontFamily: 'CentraleSansRegular',
-                                fontWeight: FontWeight.w300),
-                    ),
 
-                    InkWell(
-                      onTap: (){
-                        Get.to(CategoryPage());
-                      },
-                      child: Text(
-                        "View All",
-                         style: TextStyle(
-                                  color: kpurple.withOpacity(0.8),
-                                  fontSize: 20,
-                                  fontFamily: 'CentraleSansRegular',
-                                  fontWeight: FontWeight.w100),
-                      ),
-                    ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Icon(LineAwesomeIcons.search,
+                          color: kred,
+                          size: 30,),
+                        ),
 
+                        Text(
+                          "Explore",
+                           style: TextStyle(
+                                    color: kred,
+                                    fontSize: 35,
+                                    fontFamily: 'CentraleSansRegular'),
+                        ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                        Text(
+                          "Categories",
+                           style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 32,
+                                    fontFamily: 'CentraleSansRegular',
+                                    fontWeight: FontWeight.w300),
+                        ),
+
+                        InkWell(
+                          onTap: (){
+                            Get.to(CategoryPage());
+                          },
+                          child: Text(
+                            "View All",
+                             style: TextStyle(
+                                      color: kpurple.withOpacity(0.8),
+                                      fontSize: 20,
+                                      fontFamily: 'CentraleSansRegular',
+                                      fontWeight: FontWeight.w100),
+                          ),
+                        ),
+
+                          ],
+                        )
                       ],
-                    )
-                  ],
-                ),
-              ),
-              Divider(height: 4,thickness: 2,),
-              Container(
-                height: 50,
-                child:
-                ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: <Widget>[
-                      buildCatCard2("Education","assets/ed.png"),
-                    buildCatCard2("Humanity","assets/hum.png"),
-                    buildCatCard2("Nature","assets/nat.png"),
-                    buildCatCard2("Medicine","assets/med.png"),
+                    ),
+                  ),
+                  Divider(height: 4,thickness: 2,),
+                  Container(
+                    height: 50,
+                    child:
+                    ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: catlist.length,
+                      itemBuilder:(context,index){
+                       return buildCatCard2(catlist[index].name, "assets/nat.png",catlist[index].id,);
+              }
+                    ),
+                  ),
 
-                  ],
-                ),
-              ),
+                  Divider(height: 4,thickness: 2,),
 
-              Divider(height: 4,thickness: 2,),
+                  SizedBox(height: 20,),
 
-              SizedBox(height: 20,),
+                  Text(
+                    "Urgent Cases",
+                    style: TextStyle(
+                        color: kblackcolor,
+                        fontSize: 35,
+                        fontFamily: 'CentraleSansRegular'),
+                  ),
 
-              Text(
-                "Urgent Cases",
-                style: TextStyle(
-                    color: kblackcolor,
-                    fontSize: 35,
-                    fontFamily: 'CentraleSansRegular'),
-              ),
 
-              LiveList.options(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                options: options,
+                       LiveList.options(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        options: options,
 
-                // Like ListView.builder, but also includes animation property
-                itemBuilder: (
-                    BuildContext context,
-                    int index,
-                    Animation<double> animation,
-                ) {
-                  return animatedWidget(animation, ListofCases());
-                },
+                        // Like ListView.builder, but also includes animation property
+                        itemBuilder: (
+                            BuildContext context,
+                            int index,
+                            Animation<double> animation,
+                        ) {
+                          return animatedWidget(animation, ListofCases(urgentcase: urgentcaselist[index],));
+                        },
 
-                // Other properties correspond to the
-                // `ListView.builder` / `ListView.separated` widget
-                scrollDirection: Axis.vertical,
-                itemCount: 10,
-              )
-            ],
+                        // Other properties correspond to the
+                        // `ListView.builder` / `ListView.separated` widget
+                        scrollDirection: Axis.vertical,
+                        itemCount: urgentcaselist.length,
+                      )
+                ],
+              );
+            }
           ),
         ),
       ),
     );
   }
 
-  Widget buildCatCard2(String title , String img) {
+  Widget buildCatCard2(String title , String img,String catid) {
     return InkWell(
       onTap: (){
-        Get.to(Cases(cat: title,));
+        Get.to(Cases(cat: title,catid:catid));
       },
       child: Card(
                         child: Container(

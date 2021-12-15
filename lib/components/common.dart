@@ -1,14 +1,18 @@
+import 'package:binnazirfoundation/components/model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:php_serializer/php_serializer.dart';
 
 import 'constants.dart';
 
 class ListofCases extends StatefulWidget {
-  const ListofCases({Key key}) : super(key: key);
+  final UrgentCasesModel urgentcase;
+
+  const ListofCases({Key key, this.urgentcase}) : super(key: key);
 
   @override
   _ListofCasesState createState() => _ListofCasesState();
@@ -52,6 +56,10 @@ class _ListofCasesState extends State<ListofCases> {
     }
 
 
+   var percent = (( double.parse(widget.urgentcase.raised) * 100) /  double.parse(widget.urgentcase.amount)).toDouble().toPrecision(1) /100;
+
+
+    var image = phpDeserialize(widget.urgentcase.image)[0];
     return Column(
       children: [
         ListTile(
@@ -88,8 +96,8 @@ class _ListofCasesState extends State<ListofCases> {
               ],
             ),
           ),
-          leading: Image.asset("assets/syria.jpg"),
-          title: Text("Feeding Syria People",
+          leading: Image.network("${imageURL}$image"),
+          title: Text(widget.urgentcase.name,
               style: TextStyle(
                   fontFamily: "CentraleSansRegular",
                   fontSize: 18,
@@ -99,7 +107,7 @@ class _ListofCasesState extends State<ListofCases> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("\$14000",
+              Text("\$${widget.urgentcase.amount}",
                   style: TextStyle(
                     fontFamily: "CentraleSansRegular",
                     fontSize: 15,
@@ -130,10 +138,10 @@ class _ListofCasesState extends State<ListofCases> {
                   animation: true,
                   lineHeight: 20.0,
                   animationDuration: 2500,
-                  percent: 0.8,
-                  center: Text("\$ 11200",style: TextStyle(color: kwhite,letterSpacing: 2),),
-                  linearStrokeCap: LinearStrokeCap.roundAll,
-                  progressColor: Colors.green,
+                  percent:percent,
+                  center: Text("\$ ${widget.urgentcase.raised}",style: TextStyle(color: kwhite,letterSpacing: 2),),
+                  linearStrokeCap: LinearStrokeCap.roundAll ,
+                  progressColor: Colors.green ,
                 ),
               ),
               SizedBox(width: 10,),

@@ -1,7 +1,9 @@
 import 'package:binnazirfoundation/screens/Slider/slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'components/constants.dart';
+import 'components/splashscreenMY.dart';
 import 'login.dart';
 
 void main() => runApp(MyApp());
@@ -67,7 +69,18 @@ class MyApp extends StatelessWidget {
 
 
       ),
-      home: StartSlider(),
+      home:SplashScreenMy(
+        duration: 20000,
+
+        imageSrc: "assets/logov.gif",
+        text: "NAZIR FOUNDATION",
+        colors: [Colors.white],
+        textType: TextType1.ScaleAnimatedText,
+        textStyle: GoogleFonts.cabin(
+            fontSize: 30, color: kgreybg, fontWeight: FontWeight.bold),
+        backgroundColor: Colors.white,
+        navigateRoute: StartSlider(),
+      ),
     );
   }
 }
