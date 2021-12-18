@@ -7,6 +7,7 @@ class UrgentCasesModel {
   String amount;
   String raised;
   String country;
+  String doc;
 
   UrgentCasesModel(
       {this.id,
@@ -16,7 +17,7 @@ class UrgentCasesModel {
         this.currency,
         this.amount,
         this.raised,
-        this.country});
+        this.country,this.doc});
 
   fromJson(Map<String, dynamic> json) {
     return UrgentCasesModel(
@@ -28,6 +29,7 @@ class UrgentCasesModel {
     amount : json['amount'],
     raised : json['raised'],
     country : json['country'],
+      doc:json["doc"]
     );
    
     
@@ -43,6 +45,7 @@ class UrgentCasesModel {
     data['amount'] = this.amount;
     data['raised'] = this.raised;
     data['country'] = this.country;
+    data["doc"] = this.doc;
     return data;
   }
 }
@@ -72,3 +75,40 @@ class CategoryModel {
   }
 }
 
+
+class VolunteerModel {
+  String id;
+  String name;
+  String country;
+  String number;
+  String email;
+  String password;
+  String status;
+
+  VolunteerModel({this.id, this.name, this.country,this.password,this.email,this.status,this.number});
+
+  fromJson(Map<String, dynamic> json) {
+    return VolunteerModel(
+        id : json['id'],
+        name : json['name'],
+      country : json['country'],
+      password : json['password'],
+      email : json['email'],
+      status : json['status'],
+      number : json['number'],
+    );
+
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
+    data['password'] = this.password;
+    data['email'] = this.email;
+    data['status'] = this.status;
+    data['number'] = this.number;
+    data['country'] = this.country;
+    return data;
+  }
+}

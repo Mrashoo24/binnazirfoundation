@@ -175,7 +175,7 @@ class _ZakatCalculatorState extends State<ZakatCalculator> {
                   ? Text(
                       "Enter Gold value in your currency",
                       style: TextStyle(
-                          color: kpurple,
+                          color: kred,
                           fontSize: 22,
                           fontFamily: 'CentraleSansRegular',
                           fontWeight: FontWeight.w300),
@@ -183,7 +183,7 @@ class _ZakatCalculatorState extends State<ZakatCalculator> {
                   : Text(
                       "Enter Silver value in your currency",
                       style: TextStyle(
-                          color: kpurple,
+                          color: kred,
                           fontSize: 22,
                           fontFamily: 'CentraleSansRegular',
                           fontWeight: FontWeight.w300),
@@ -218,7 +218,7 @@ class _ZakatCalculatorState extends State<ZakatCalculator> {
               Text(
                 "Enter Total Income",
                 style: TextStyle(
-                    color: kpurple,
+                    color: kred,
                     fontSize: 22,
                     fontFamily: 'CentraleSansRegular',
                     fontWeight: FontWeight.w300),
@@ -259,7 +259,7 @@ class _ZakatCalculatorState extends State<ZakatCalculator> {
               Text(
                 "Total Income =$incomes",
                 style: TextStyle(
-                    color: kpurple,
+                    color: kred,
                     fontSize: 22,
                     fontFamily: 'CentraleSansRegular',
                     fontWeight: FontWeight.w300),
@@ -272,7 +272,7 @@ class _ZakatCalculatorState extends State<ZakatCalculator> {
               Text(
                 "Enter Total Expense",
                 style: TextStyle(
-                    color: kpurple,
+                    color: kred,
                     fontSize: 22,
                     fontFamily: 'CentraleSansRegular',
                     fontWeight: FontWeight.w300),
@@ -301,13 +301,14 @@ class _ZakatCalculatorState extends State<ZakatCalculator> {
               Text(
                 "Total Expenses =$expenses",
                 style: TextStyle(
-                    color: kpurple,
+                    color: kred,
                     fontSize: 22,
                     fontFamily: 'CentraleSansRegular',
                     fontWeight: FontWeight.w300),
               ),
 
               ElevatedButton(
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(kred)),
                   onPressed: () {
                     if (selectedasset) {
                       if (goldCurrency == "" || goldCurrency == "0") {
@@ -387,7 +388,7 @@ class _ZakatCalculatorState extends State<ZakatCalculator> {
           ),
         ),
         keyboardType: TextInputType.number,
-        style: TextStyle(color: kpurple),
+        style: TextStyle(color: kred),
         onChanged: function,
       ),
     );

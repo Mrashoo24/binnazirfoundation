@@ -1,21 +1,30 @@
 
+import 'dart:io';
+
 import 'package:auto_animated/auto_animated.dart';
+import 'package:binnazirfoundation/UserProfile/registeration.dart';
 import 'package:binnazirfoundation/components/common.dart';
 import 'package:binnazirfoundation/components/constants.dart';
 import 'package:binnazirfoundation/components/model.dart';
+import 'package:binnazirfoundation/login.dart';
 import 'package:binnazirfoundation/screens/cases/cases.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'categfories/category.dart';
 
-class Explore extends StatelessWidget {
+class Explore extends StatefulWidget {
+  final String userid;
 
-
+  const Explore({Key key, this.userid}) : super(key: key);
   // Build animated item (helper for all examples)
 
 
@@ -23,24 +32,30 @@ class Explore extends StatelessWidget {
 
 
   @override
+  State<Explore> createState() => _ExploreState();
+}
+
+class _ExploreState extends State<Explore> {
+ScrollController scrollController = ScrollController();
+bool viewAppBar = true;
+
+  @override
   Widget build(BuildContext context) {
-
-    allapi.getUrgentCases();
-
 
 
     return SafeArea(
       child: SingleChildScrollView(
+        controller: scrollController,
         child: Padding(
           padding:  EdgeInsets.all(kscafpadding),
           child: FutureBuilder(
-            future: Future.wait([allapi.getUrgentCases(),  allapi.getCategory()]),
+            future: Future.wait([allapi.getUrgentCases(),  allapi.getCategory(),]),
             builder: (context, snapshot) {
 
 
               if(!snapshot.hasData){
 
-                return Center(child:Image.asset("assets/preloader.png",width: 100,height: 100,));
+                return preloader;
 
               }
 
@@ -55,20 +70,35 @@ class Explore extends StatelessWidget {
 
               return Column(
                 children: <Widget>[
+
+                  SizedBox(height: 40,),
                   Container(
-                    height: Get.height*0.16,
+                    height: Get.height*0.22,
                     child: Column(
 
                       crossAxisAlignment: CrossAxisAlignment.start,
 
                       children: <Widget>[
 
-                        Align(
+                       widget.userid == "Guest" ? Align(
                           alignment: Alignment.centerRight,
-                          child: Icon(LineAwesomeIcons.search,
-                          color: kred,
-                          size: 30,),
-                        ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(onPressed: (){
+                                Get.to(Registeration());
+                              }, child: Text("BECOME A VOLUNTEER",style: TextStyle(fontSize: 10),),style: ButtonStyle(backgroundColor: MaterialStateProperty.all(kred.withOpacity(0.6)
+                              ),
+                              ),
+                              ),
+                              Icon(LineAwesomeIcons.search,
+                              color: kred,
+                              size: 30,),
+
+                            ],
+                          ),
+                        ) : SizedBox(height: 50,),
 
                         Text(
                           "Explore",
@@ -92,7 +122,7 @@ class Explore extends StatelessWidget {
 
                         InkWell(
                           onTap: (){
-                            Get.to(CategoryPage());
+                            Get.to(CategoryPage(catList:catlist));
                           },
                           child: Text(
                             "View All",
@@ -127,11 +157,13 @@ class Explore extends StatelessWidget {
                   SizedBox(height: 20,),
 
                   Text(
+
                     "Urgent Cases",
                     style: TextStyle(
                         color: kblackcolor,
                         fontSize: 35,
                         fontFamily: 'CentraleSansRegular'),
+
                   ),
 
 
@@ -146,7 +178,7 @@ class Explore extends StatelessWidget {
                             int index,
                             Animation<double> animation,
                         ) {
-                          return animatedWidget(animation, ListofCases(urgentcase: urgentcaselist[index],));
+                          return animatedWidget(animation, ListofCases(urgentcase: urgentcaselist[index]));
                         },
 
                         // Other properties correspond to the
@@ -185,5 +217,4 @@ class Explore extends StatelessWidget {
                       ),
     );
   }
-
 }

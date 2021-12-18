@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactUs extends StatefulWidget {
   const ContactUs({Key key}) : super(key: key);
@@ -25,14 +26,7 @@ class _ContactUsState extends State<ContactUs> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-
-            Align(
-              alignment: Alignment.centerRight,
-              child: Icon(LineAwesomeIcons.search,
-                color: kred,
-                size: 30,),
-            ),
-
+            SizedBox(height: 50,),
             Text(
               "Contact",
               style: TextStyle(
@@ -64,16 +58,25 @@ class _ContactUsState extends State<ContactUs> {
                     child: Text(
                       "Email",
                       style: GoogleFonts.slabo27px(
-                          color: kpurple,
+                          color: kgreybg,
                           fontWeight: FontWeight.bold,
                           fontSize: 20),
                     )),
-                Container(
-                    margin: EdgeInsets.symmetric(horizontal: 30),
-                    child: Text(
-                      "Info@binnazir.com",
-                      style: TextStyle(color: Colors.blue),
-                    )),
+                InkWell(
+                  onTap: (){
+
+                    launch("mailto:smith@example.org?subject=News&body=New%20plugin");
+
+                  },
+                  child: Container(
+
+                      margin: EdgeInsets.symmetric(horizontal: 30),
+                      child: Text(
+                        "help@nazircare.com",
+                        style: TextStyle(color: kred),
+
+                      )),
+                ),
               ],
             ),
             Column(
@@ -85,33 +88,36 @@ class _ContactUsState extends State<ContactUs> {
                     child: Text(
                       "Follow Us:",
                       style: GoogleFonts.slabo27px(
-                          color: kpurple.withOpacity(0.8),
+                          color: kgreybg.withOpacity(0.8),
                           fontWeight: FontWeight.bold,
                           fontSize: 20),
                     )
                 ),
                 SizedBox(height: 10,),
-                Center(
-                  child: Wrap(
-                    children: [
-                      buildInkWell(FontAwesomeIcons.facebook),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      buildInkWell(FontAwesomeIcons.instagram),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      buildInkWell(FontAwesomeIcons.youtube),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      buildInkWell(FontAwesomeIcons.snapchatGhost),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      buildInkWell(FontAwesomeIcons.twitter),
-                    ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0,vertical: 15),
+                  child: Center(
+                    child: Wrap(
+                      children: [
+                        buildInkWell(FontAwesomeIcons.facebook,"https://www.facebook.com/Nazircare-100648252490451/"),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        buildInkWell(FontAwesomeIcons.instagram,"https://www.instagram.com/nazircare/"),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        // buildInkWell(FontAwesomeIcons.youtube,""),
+                        // SizedBox(
+                        //   width: 30,
+                        // ),
+                        // buildInkWell(FontAwesomeIcons.snapchatGhost,""),
+                        // SizedBox(
+                        //   width: 30,
+                        // ),
+                        // buildInkWell(FontAwesomeIcons.twitter,""),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -151,14 +157,14 @@ class _ContactUsState extends State<ContactUs> {
     );
   }
 
-  InkWell buildInkWell(IconData icon) {
+  InkWell buildInkWell(IconData icon,url) {
     return InkWell(
       onTap: () {
-        // launch('https://www.facebook.com/' + "Zaika-Pizza-Hub-114019143801563");
+         launch(url);
       },
       child: Icon(
         icon,
-        size: 50,
+        size: 30,
       ),
     );
   }

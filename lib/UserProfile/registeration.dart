@@ -1,24 +1,20 @@
-import 'package:binnazirfoundation/UserProfile/registeration.dart';
 import 'package:binnazirfoundation/components/constants.dart';
 import 'package:binnazirfoundation/components/model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:get/get_utils/src/extensions/string_extensions.dart';
-import 'package:line_awesome_icons/line_awesome_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class UserProfile extends StatefulWidget {
-  final String userid;
-  const UserProfile({Key key, this.userid}) : super(key: key);
+class Registeration extends StatefulWidget {
+  const Registeration({Key key}) : super(key: key);
 
   @override
-  _UserProfileState createState() => _UserProfileState();
+  _RegisterationState createState() => _RegisterationState();
 }
 
-class _UserProfileState extends State<UserProfile> {
+class _RegisterationState extends State<Registeration> {
   bool showPassword = false;
 
   TextEditingController emailController;
@@ -37,39 +33,38 @@ class _UserProfileState extends State<UserProfile> {
   String phone;
   String country;
 
+  bool payment = false;
 
+  Future getPayment() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var value = pref.getBool("payment") ?? false;
+
+    return value;
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    getPayment().then((value) {
+      print("payment $value");
+      setState(() {
+        payment = value;
+      });
+    });
+  }
 
 
   @override
   Widget build(BuildContext context) {
-    print("use ${widget.userid}");
     return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.white,elevation: 0,automaticallyImplyLeading: true,actionsIconTheme: IconThemeData(color: kred),iconTheme: IconThemeData(color: kred),),
+
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(kscafpadding),
-          child: Center(
-              child: widget.userid == "Guest"
-                  ? buildLoginForm()
-                  : FutureBuilder(
-                    future: allapi.getVolunteer(widget.userid),
-                    builder: (context, snapshot) {
-                      if(!snapshot.hasData){
-
-                        return preloader;
-
-                      }
-
-                      if(snapshot.hasError){
-
-                        Fluttertoast.showToast(msg: "Something Went Wrong ");
-
-                      }
-
-
-                      return buildRegisterColumn(context,snapshot.requireData);
-                    }
-                  )
+          child: Center(child: buildRegisterColumn(context)
 
               // buildRegisterColumn(context),
               ),
@@ -78,139 +73,7 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  Widget buildLoginForm() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 50,
-          ),
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "LOGIN",
-                style: TextStyle(
-                    color: kred,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 30,
-                    letterSpacing: 3),
-              )),
-          Divider(
-            height: 4,
-            thickness: 2,
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          TextFormField(
-            style: TextStyle(
-                color: Colors.black, fontFamily: "CentraleSansRegular"),
-            decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white.withOpacity(.4),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kred, width: 3)),
-                disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kred, width: 3)),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kred, width: 3)),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kred, width: 3)),
-                labelText: "Registered Number",
-                labelStyle: TextStyle(
-                    color: Colors.black.withOpacity(.4),
-                    fontSize: 17,
-                    fontFamily: "CentraleSansRegular")),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          TextFormField(
-            obscureText: true,
-            style: TextStyle(
-                color: Colors.black, fontFamily: "CentraleSansRegular"),
-            decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white.withOpacity(.4),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kred, width: 3)),
-                disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kred, width: 3)),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kred, width: 3)),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: kred, width: 3)),
-                labelText: "Password",
-                labelStyle: TextStyle(
-                    color: Colors.black.withOpacity(.4),
-                    fontSize: 17,
-                    fontFamily: "CentraleSansRegular")),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Container(
-            width: 330,
-            height: 60,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              border: Border.all(color: kgreybg, width: 1),
-              gradient: LinearGradient(
-                stops: [0.1, 0.5],
-                colors: [
-                  Color(0xffffffff).withOpacity(0.8),
-                  kred,
-                ],
-              ),
-            ),
-            child: Center(
-              child: Text(
-                "Login",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: "CentraleSansRegular",
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          SizedBox(height: 30,),
-          Row(
-            children: [
-              Text("Not A Member Yet ?"),
-              SizedBox(width: 10,),
-              ElevatedButton(
-                onPressed: () {
-                  Get.to(Registeration());
-                },
-                child: Text(
-                  "BECOME A VOLUNTEER",
-                  style: TextStyle(fontSize: 10),
-                ),
-
-                style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(kred.withOpacity(0.6)),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Column buildRegisterColumn(BuildContext context,List<VolunteerModel> vol) {
+  Column buildRegisterColumn(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,16 +82,15 @@ class _UserProfileState extends State<UserProfile> {
           height: 50,
         ),
         Text(
-          "User",
+          "Volunteer",
           style: TextStyle(
               color: kred, fontSize: 35, fontFamily: 'CentraleSansRegular'),
         ),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
-              "Profile",
+              "Registration",
               style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 32,
@@ -241,35 +103,10 @@ class _UserProfileState extends State<UserProfile> {
           height: 4,
           thickness: 2,
         ),
-        SizedBox(height: 10,),
-       vol[0].status == "1"? SizedBox() : Row(
-
-          children: [
-
-            Image.asset("assets/wrong.gif", height: 50, width: 50 ),
-
-            Text("This Month Payment is Pending",style: TextStyle(fontSize: 18), ),
-
-          ],
-
-        ),
-        ElevatedButton(onPressed: (){
-          launch("https://pmny.in/lrUxi6efvkST");
-
-
-        }, child: Text("PAY NOW",style: TextStyle(fontSize: 10),),
-
-          style: ButtonStyle(
-
-          backgroundColor: MaterialStateProperty.all(kred.withOpacity(0.6),
-
-        ),
-        ),
-        ),
-        Container(
+        payment
+            ? SizedBox() :   Container(
           margin: EdgeInsets.only(top: 22.5, right: 22.5, left: 22.5),
           child: TextField(
-            enabled: false,
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
             cursorColor: kblackcolor,
@@ -294,7 +131,7 @@ class _UserProfileState extends State<UserProfile> {
                 color: kpurple,
               ),
               contentPadding: EdgeInsets.all(11.25),
-              hintText: vol[0].email,
+              hintText: "Email",
               hintStyle: TextStyle(
                 color: Colors.black.withOpacity(0.4),
               ),
@@ -307,10 +144,10 @@ class _UserProfileState extends State<UserProfile> {
             },
           ),
         ),
-        Container(
+        payment
+            ? SizedBox() :   Container(
           margin: EdgeInsets.only(top: 22.5, right: 22.5, left: 22.5),
           child: TextField(
-            enabled: false,
             controller: phoneController,
             cursorColor: kblackcolor,
             keyboardType: TextInputType.phone,
@@ -335,7 +172,7 @@ class _UserProfileState extends State<UserProfile> {
                 color: kpurple,
               ),
               contentPadding: EdgeInsets.all(11.25),
-              hintText: vol[0].number,
+              hintText: "Phone Number",
               hintStyle: TextStyle(
                 color: Colors.black.withOpacity(0.4),
               ),
@@ -348,11 +185,10 @@ class _UserProfileState extends State<UserProfile> {
             },
           ),
         ),
-
-        Container(
+        payment
+            ? SizedBox() :    Container(
           margin: EdgeInsets.only(top: 22.5, right: 22.5, left: 22.5),
           child: TextField(
-            enabled: false,
             controller: nameController,
             cursorColor: kblackcolor,
             decoration: InputDecoration(
@@ -376,7 +212,7 @@ class _UserProfileState extends State<UserProfile> {
                 color: kpurple,
               ),
               contentPadding: EdgeInsets.all(11.25),
-              hintText: vol[0].name,
+              hintText: "User Name",
               hintStyle: TextStyle(
                 color: Colors.black.withOpacity(0.4),
               ),
@@ -389,11 +225,10 @@ class _UserProfileState extends State<UserProfile> {
             },
           ),
         ),
-
-        Container(
+        payment
+            ? SizedBox() :    Container(
           margin: EdgeInsets.only(top: 22.5, right: 22.5, left: 22.5),
           child: TextField(
-            enabled: false,
             controller: passwordController,
             obscureText: true,
             cursorColor: kblackcolor,
@@ -418,7 +253,7 @@ class _UserProfileState extends State<UserProfile> {
                 color: kpurple,
               ),
               contentPadding: EdgeInsets.all(11.25),
-              hintText: vol[0].password,
+              hintText: "User Password",
               hintStyle: TextStyle(
                 color: Colors.black.withOpacity(0.4),
               ),
@@ -431,11 +266,10 @@ class _UserProfileState extends State<UserProfile> {
             },
           ),
         ),
-
-        Container(
+        payment
+            ? SizedBox() :   Container(
           margin: EdgeInsets.only(top: 22.5, right: 22.5, left: 22.5),
           child: TextField(
-            enabled: false,
             controller: countryController,
             cursorColor: kblackcolor,
             decoration: InputDecoration(
@@ -459,7 +293,7 @@ class _UserProfileState extends State<UserProfile> {
                 color: kpurple,
               ),
               contentPadding: EdgeInsets.all(11.25),
-              hintText: vol[0].country,
+              hintText: "Country",
               hintStyle: TextStyle(
                 color: Colors.black.withOpacity(0.4),
               ),
@@ -472,44 +306,113 @@ class _UserProfileState extends State<UserProfile> {
             },
           ),
         ),
+        payment
+            ? Container(
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                margin: EdgeInsets.only(top: 20, left: 30, right: 30),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      kred,
+                    ),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ),
+                  onPressed: () async {
+                    if (phone != null &&
+                        phone != "" &&
+                        name != null &&
+                        name != "" &&
+                        email != null &&
+                        email != "" &&
+                        password != null &&
+                        password != "" &&
+                        country != null &&
+                        country != "") {
 
-        // Container(
-        //   width: MediaQuery.of(context).size.width,
-        //   height: 60,
-        //   margin: EdgeInsets.only(top: 20, left: 30, right: 30),
-        //   child: ElevatedButton(
-        //     style: ButtonStyle(
-        //       backgroundColor: MaterialStateProperty.all<Color>(
-        //         kred,
-        //       ),
-        //       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-        //         RoundedRectangleBorder(
-        //           borderRadius: BorderRadius.circular(30),
-        //         ),
-        //       ),
-        //     ),
-        //     onPressed: () {
-        //       if (
-        //           phone != null &&
-        //           phone != ""&& name != null &&
-        //               name != ""&& email != null &&
-        //               email != ""&& password != null &&
-        //               password != ""&&  country != null &&
-        //               country != "") {
-        //
-        //       } else {
-        //         Get.snackbar("ERROR", "PLEASE CHECK DETAILS AGAIN",
-        //             backgroundColor: kredcolor,
-        //             snackPosition: SnackPosition.BOTTOM);
-        //       }
-        //     },
-        //     child: Text("SAVE CHANGES",
-        //         style: TextStyle(
-        //           color: kwhite,
-        //           fontSize: 17,
-        //         )),
-        //   ),
-        // ),
+                      await launch("https://pmny.in/lrUxi6efvkST");
+
+                    } else {
+                      Get.snackbar("ERROR", "PLEASE CHECK DETAILS AGAIN",
+                          backgroundColor: kredcolor,
+                          snackPosition: SnackPosition.BOTTOM);
+                    }
+                  },
+                  child: Text("Pay Membership Fee Now",
+                      style: TextStyle(
+                        color: kwhite,
+                        fontSize: 17,
+                      )),
+                ),
+              )
+            : Container(
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                margin: EdgeInsets.only(top: 20, left: 30, right: 30),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      kred,
+                    ),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ),
+                  onPressed: () async {
+
+                    if (phone != null &&
+                        phone != "" &&
+                        name != null &&
+                        name != "" &&
+                        email != null &&
+                        email != "" &&
+                        password != null &&
+                        password != "" &&
+                        country != null &&
+                        country != "") {
+                      await allapi
+                          .setVolunteer(VolunteerModel(
+                              name: name,
+                              country: country,
+                              password: password,
+                              email: email,
+                              status: "0",
+                              number: phone))
+                          .then((value) async {
+                        if (value == "User has been updated!") {
+                          Get.snackbar("Your Form is Submitted",
+                              "Please Pay the Monthly Membership Fee For More Info Contact Us");
+
+                           SharedPreferences pref = await SharedPreferences.getInstance();
+                            pref.setBool("payment", true);
+                          setState(() {
+                            payment = true;
+                          });
+                        }
+                        {
+                          Fluttertoast.showToast(msg: "Something Went Wrong");
+                        }
+                      });
+                    } else {
+                      Get.snackbar("ERROR", "PLEASE CHECK DETAILS AGAIN",
+                          backgroundColor: kredcolor,
+                          snackPosition: SnackPosition.BOTTOM);
+                    }
+
+                  },
+                  child: Text("SAVE CHANGES",
+                      style: TextStyle(
+                        color: kwhite,
+                        fontSize: 17,
+                      )),
+                ),
+              ),
         SizedBox(
           height: 20,
         ),

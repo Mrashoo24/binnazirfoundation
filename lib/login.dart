@@ -1,6 +1,9 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/constants.dart';
 import 'homePage.dart';
@@ -11,6 +14,22 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
+  String name;
+  String phone;
+  String password;
+  bool loading = false;
+
+  //token
+  String token = '';
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+
+  void getToken(String uid) async {
+    token = (await firebaseMessaging.getToken());
+      await allapi.updateToken(uid, token);
+  }
+//token
+
   @override
   Widget build(BuildContext context) {
 
@@ -50,7 +69,7 @@ class _LoginState extends State<Login> {
                       height: Get.height * 0.3 ,
                       child: FadeInImage(placeholder: AssetImage("assets/logo.webp"), image: AssetImage("assets/logo.webp"))
                     ),
-                    Text("NAZIR FOUNDATION",style: TextStyle(color: kgreybg,fontSize: 22,fontWeight: FontWeight.w700),)
+                    Text("NAZIR CARE FOUNDATION",style: TextStyle(color: kgreybg,fontSize: 22,fontWeight: FontWeight.w700),)
                   ],
                 ),
               ),
@@ -112,11 +131,21 @@ class _LoginState extends State<Login> {
                                 color: Colors.black.withOpacity(.4),
                                 fontSize: 17,
                                 fontFamily: "CentraleSansRegular")),
+                        onChanged: (value){
+                          setState(() {
+                            phone = value;
+                          });
+                        },
                       ),
                       SizedBox(
                         height: 20,
                       ),
                       TextFormField(
+                        onChanged: (value){
+                          setState(() {
+                            password = value;
+                          });
+                        },
                         obscureText: true,
                         style: TextStyle(
                             color: Colors.black,
@@ -149,28 +178,72 @@ class _LoginState extends State<Login> {
                       SizedBox(
                         height: 20,
                       ),
-                      Container(
-                        width: 330,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                          border: Border.all(color: kgreybg,width: 1),
-                          gradient: LinearGradient(
-                            stops: [0.1, 0.5],
-                            colors: [
-                              Color(0xffffffff).withOpacity(0.8),
-                              kred,
-                            ],
+                      InkWell(
+
+                        onTap: (){
+                            if(phone == null || password == null){
+                              Get.snackbar("No User Found", "",snackPosition: SnackPosition.BOTTOM,backgroundColor: kred.withOpacity(0.4));
+                            }else{
+                              allapi.getVolunteer(phone).then((value) async {
+
+                                print(value.length);
+
+                                if(value.length == 0){
+
+
+                                  Get.snackbar("No User Found", "",snackPosition: SnackPosition.BOTTOM,backgroundColor: kred.withOpacity(0.4));
+
+                                }else{
+
+                                  var userPassword = value[0].password;
+
+                                  if(userPassword == password){
+                                    SharedPreferences pref = await SharedPreferences.getInstance();
+                                    await getToken(phone);
+                                    pref.setString("userid", phone);
+                                        Get.offAll(HomePage(userId:phone));
+
+
+
+                                  }else{
+
+                                    Get.snackbar("Error", "Password Incorrect",snackPosition: SnackPosition.BOTTOM,backgroundColor: kred.withOpacity(0.4));
+
+                                  }
+
+
+                                }
+
+
+
+                              });
+                            }
+
+
+                        },
+                        child: Container(
+                          width: 330,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            border: Border.all(color: kgreybg,width: 1),
+                            gradient: LinearGradient(
+                              stops: [0.1, 0.5],
+                              colors: [
+                                Color(0xffffffff).withOpacity(0.8),
+                                kred,
+                              ],
+                            ),
                           ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Login",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "CentraleSansRegular",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold),
+                          child: Center(
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "CentraleSansRegular",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
                       ),
@@ -200,11 +273,16 @@ class _LoginState extends State<Login> {
                         height: 20,
                       ),
                       InkWell(
-                        onTap: () {
+                        onTap: () async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          //Return bool
+                          prefs.setBool('loggedin',true);
+
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomePage()));
+                                  builder: (context) => HomePage(userId : "Guest"))
+                          );
                         },
                         child: Container(
 

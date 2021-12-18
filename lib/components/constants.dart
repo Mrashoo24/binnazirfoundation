@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:auto_animated/auto_animated.dart';
 import 'package:binnazirfoundation/components/api.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'common.dart';
 
@@ -22,6 +23,15 @@ var scafKey = GlobalKey<ScaffoldState>();
 const URL = "https://nazircare.com/mrzulf/api/";
 const imageURL = "https://nazircare.com/causes/";
 var allapi = AllApi();
+
+var preloader =Container(
+height: Get.height,
+width: Get.width,
+child: Padding(
+padding: const EdgeInsets.all(100),
+child: Image.asset("assets/preloader.png",width: 100,height: 100,),
+)
+);
 
 
 

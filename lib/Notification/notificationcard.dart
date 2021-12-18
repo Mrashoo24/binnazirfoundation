@@ -7,7 +7,8 @@ import 'package:get/get.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class NotificationCard extends StatefulWidget {
-  const NotificationCard({Key key}) : super(key: key);
+  final List notifications;
+  const NotificationCard({Key key, this.notifications}) : super(key: key);
 
   @override
   _NotificationCardState createState() => _NotificationCardState();

@@ -1,14 +1,97 @@
+import 'package:binnazirfoundation/homePage.dart';
 import 'package:binnazirfoundation/screens/Slider/slider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'components/constants.dart';
 import 'components/splashscreenMY.dart';
 import 'login.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-void main() => runApp(MyApp());
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    'This channel is used for important notifications.', // description
+    importance: Importance.max,
+    playSound: true,
+    sound: RawResourceAndroidNotificationSound('notification'),
+    enableLights: true);
 
-class MyApp extends StatelessWidget {
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+Future<void> firebaseMessgaingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("a message bg : ${message.messageId}");
+}
+
+
+
+
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessgaingBackgroundHandler);
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+
+    alert: true, // Required to display a heads up notification
+    badge: true,
+    sound: true,
+
+  );
+
+  runApp(MyApp());
+}
+
+
+class MyApp extends StatefulWidget {
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var isloggedin = false;
+
+  var id = "null";
+
+  Future getBoolValuesSF() async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Return bool
+    bool boolValue = prefs.getBool('loggedin') ?? false;
+    String id = prefs.getString("userid") ?? "null";
+
+    print("boolvalue $boolValue");
+    print("id $id");
+    return [boolValue,id];
+
+  }
+
+
+  @override
+  void initState() {
+
+    getBoolValuesSF().then((value) {
+
+      setState(() {
+        isloggedin = value[0];
+        id = value[1];
+      });
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -70,7 +153,7 @@ class MyApp extends StatelessWidget {
 
       ),
       home:SplashScreenMy(
-        duration: 20000,
+        duration: 18000,
 
         imageSrc: "assets/logov.gif",
         text: "NAZIR FOUNDATION",
@@ -79,7 +162,7 @@ class MyApp extends StatelessWidget {
         textStyle: GoogleFonts.cabin(
             fontSize: 30, color: kgreybg, fontWeight: FontWeight.bold),
         backgroundColor: Colors.white,
-        navigateRoute: StartSlider(),
+        navigateRoute: id != "null" ? HomePage(userId: id,) : isloggedin ? Login() :StartSlider(),
       ),
     );
   }
