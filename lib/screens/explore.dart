@@ -38,6 +38,8 @@ class Explore extends StatefulWidget {
 class _ExploreState extends State<Explore> {
 ScrollController scrollController = ScrollController();
 bool viewAppBar = true;
+List<UrgentCasesModel> urgentCases = [] ;
+String search ;
 
   @override
   Widget build(BuildContext context) {
@@ -80,25 +82,83 @@ bool viewAppBar = true;
 
                       children: <Widget>[
 
-                       widget.userid == "Guest" ? Align(
+                       Align(
                           alignment: Alignment.centerRight,
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ElevatedButton(onPressed: (){
+
+                              widget.userid == "Guest" ?    ElevatedButton(onPressed: (){
+
                                 Get.to(Registeration());
+
                               }, child: Text("BECOME A VOLUNTEER",style: TextStyle(fontSize: 10),),style: ButtonStyle(backgroundColor: MaterialStateProperty.all(kred.withOpacity(0.6)
                               ),
                               ),
+                              ): SizedBox(height: 50,),
+
+                              // InkWell(
+                              //   onTap: (){
+                              //
+                              //
+                              //   },
+                              //   child: Icon(LineAwesomeIcons.search,
+                              //   color: kred,
+                              //   size: 30,),
+                              // ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 15.0),
+                                  child: TextFormField(
+                                    keyboardType: TextInputType.emailAddress,
+                                    cursorColor: kred,
+                                    decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: kred.withOpacity(0.6), width: 3)),
+                                      disabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: kred.withOpacity(0.6), width: 3)),
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: kred.withOpacity(0.6), width: 3)),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide(color: kred, width: 3)),
+                                      suffixIcon: Icon(
+                                        Icons.search,
+                                        color: kred,
+                                      ),
+                                      contentPadding: EdgeInsets.all(11.25),
+                                      hintText: "Search",
+                                      hintStyle: TextStyle(
+                                        color: Colors.black.withOpacity(0.4),
+                                      ),
+                                    ),
+                                    style: TextStyle(color: kpurple),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        search = value.removeAllWhitespace;
+
+                                        setState(() {
+
+                                          urgentCases = urgentcaselist.where((element) => element.name.toLowerCase().contains(value.removeAllWhitespace.toLowerCase() ?? "")).toList();
+
+                                        });
+                                        print(urgentCases );
+                                      });
+                                    },
+                                  ),
+                                ),
                               ),
-                              Icon(LineAwesomeIcons.search,
-                              color: kred,
-                              size: 30,),
 
                             ],
                           ),
-                        ) : SizedBox(height: 50,),
+                        ) ,
 
                         Text(
                           "Explore",
@@ -167,7 +227,7 @@ bool viewAppBar = true;
                   ),
 
 
-                       LiveList.options(
+                     LiveList.options(
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         options: options,
@@ -178,13 +238,13 @@ bool viewAppBar = true;
                             int index,
                             Animation<double> animation,
                         ) {
-                          return animatedWidget(animation, ListofCases(urgentcase: urgentcaselist[index]));
+                          return animatedWidget(animation, ListofCases(urgentcase: search == null || search.toString().isBlank ? urgentcaselist[index] : urgentCases[index]));
                         },
 
                         // Other properties correspond to the
                         // `ListView.builder` / `ListView.separated` widget
                         scrollDirection: Axis.vertical,
-                        itemCount: urgentcaselist.length,
+                        itemCount: search == null || search.toString().isBlank ? urgentcaselist.length : urgentCases.length,
                       )
                 ],
               );

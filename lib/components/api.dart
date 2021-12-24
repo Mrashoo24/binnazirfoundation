@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:binnazirfoundation/components/model.dart';
 import 'package:http/http.dart' as http;
-import 'package:php_serializer/php_serializer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants.dart';
@@ -85,10 +84,11 @@ class AllApi {
 
 
   Future setBelovedCases(List urgentCaseList) async {
+
      SharedPreferences pref = await SharedPreferences.getInstance();
 
 
-        print("gotListonapi = $urgentCaseList");
+     print("gotListonapi = $urgentCaseList");
 
      pref.setStringList("caselist", urgentCaseList);
 
@@ -99,6 +99,7 @@ class AllApi {
 
 
   Future getBelovedCases() async {
+
     SharedPreferences pref = await SharedPreferences.getInstance();
 
     //
@@ -109,7 +110,10 @@ List decodedlist =    jsonDecode(pref.getStringList("caselist").toString());
 
 
     var newList = decodedlist == null ? [] : decodedlist.map((e) {
+
       print(e);
+
+
       return UrgentCasesModel().fromJson(e);
     }).toList();
 

@@ -5,10 +5,13 @@ import 'package:flutter/painting.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationCard extends StatefulWidget {
   final List notifications;
-  const NotificationCard({Key key, this.notifications}) : super(key: key);
+  final List notList;
+  final int index;
+  const NotificationCard({Key key, this.notifications, this.index, this.notList}) : super(key: key);
 
   @override
   _NotificationCardState createState() => _NotificationCardState();
@@ -19,7 +22,15 @@ class _NotificationCardState extends State<NotificationCard> {
 
   String selectedPrice = null;
   bool fav = false;
+  List not = [];
 
+  @override
+  void initState() {
+   setState(() {
+     not = widget.notList;
+   });
+    super.initState();
+  }
 
 
   @override
@@ -53,17 +64,21 @@ class _NotificationCardState extends State<NotificationCard> {
 
     return Column(
       children: [
+
         ListTile(
           trailing: Container(
-            child: IconButton(icon: Icon(FontAwesomeIcons.trash,color: kblackcolor,), onPressed: () {
-              setState(() {
+            child: IconButton(icon: Icon(FontAwesomeIcons.trash,color: kblackcolor,), onPressed: ()async {
+              SharedPreferences  pref =await SharedPreferences.getInstance();
+                not.removeAt(widget.index);
+                pref.setStringList("notifications", not);
+                  setState(() {
 
-              });
+                  });
             },
             ),
           ),
-          leading: Image.asset("assets/syria.jpg"),
-          title: Text("Your Monthly Donation is Pending",
+          // leading: Image.asset("assets/syria.jpg"),
+          title: Text(widget.notifications[0],
               style: TextStyle(
                   fontFamily: "CentraleSansRegular",
                   fontSize: 18,
@@ -73,12 +88,14 @@ class _NotificationCardState extends State<NotificationCard> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("\$200",
+
+              Text(widget.notifications[1],
                   style: TextStyle(
                     fontFamily: "CentraleSansRegular",
                     fontSize: 15,
                   )),
               SizedBox(height: 10,),
+
             ],
           ),
         ),

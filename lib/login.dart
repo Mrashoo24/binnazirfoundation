@@ -1,8 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/constants.dart';
@@ -199,7 +197,7 @@ class _LoginState extends State<Login> {
 
                                   if(userPassword == password){
                                     SharedPreferences pref = await SharedPreferences.getInstance();
-                                    await getToken(phone);
+                                    await getToken( value[0].id);
                                     pref.setString("userid", phone);
                                         Get.offAll(HomePage(userId:phone));
 

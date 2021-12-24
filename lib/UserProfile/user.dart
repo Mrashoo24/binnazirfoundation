@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:binnazirfoundation/UserProfile/registeration.dart';
 import 'package:binnazirfoundation/components/constants.dart';
 import 'package:binnazirfoundation/components/model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:get/get_utils/src/extensions/string_extensions.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,7 +24,7 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   bool showPassword = false;
-
+  Map<String,dynamic> paymentIntentData ;
   TextEditingController emailController;
 
   TextEditingController passwordController;
@@ -37,7 +41,15 @@ class _UserProfileState extends State<UserProfile> {
   String phone;
   String country;
 
+@override
+  void initState() {
 
+  Stripe.publishableKey = "pk_test_51K9pBSSInPgXpYUdgzGFJk1usakCKEpLVKyTnWAtoey5m6YNmAfg2sRPJhbA15WO6FqrgrfttLyeOjDYWTHuYcEO00fZ294a4T";
+
+
+  super.initState();
+
+  }
 
 
   @override
@@ -77,6 +89,7 @@ class _UserProfileState extends State<UserProfile> {
       ),
     );
   }
+
 
   Widget buildLoginForm() {
     return SingleChildScrollView(
@@ -191,11 +204,15 @@ class _UserProfileState extends State<UserProfile> {
               SizedBox(width: 10,),
               ElevatedButton(
                 onPressed: () {
+
                   Get.to(Registeration());
+
                 },
                 child: Text(
+
                   "BECOME A VOLUNTEER",
                   style: TextStyle(fontSize: 10),
+
                 ),
 
                 style: ButtonStyle(
@@ -211,6 +228,7 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   Column buildRegisterColumn(BuildContext context,List<VolunteerModel> vol) {
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,7 +260,7 @@ class _UserProfileState extends State<UserProfile> {
           thickness: 2,
         ),
         SizedBox(height: 10,),
-       vol[0].status == "1"? SizedBox() : Row(
+        vol[0].pay == "1"? SizedBox() : Row(
 
           children: [
 
@@ -253,19 +271,27 @@ class _UserProfileState extends State<UserProfile> {
           ],
 
         ),
-        ElevatedButton(onPressed: (){
-          launch("https://pmny.in/lrUxi6efvkST");
+        vol[0].pay == "1"? SizedBox() :  ElevatedButton(onPressed: () async {
 
+
+          // final paymentMethod =
+          //     await Stripe.instance.createPaymentMethod(PaymentMethodParams.card());
+
+
+          // launch("https://pmny.in/lrUxi6efvkST");
+
+paymentOnline();
 
         }, child: Text("PAY NOW",style: TextStyle(fontSize: 10),),
 
+
           style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(kred.withOpacity(0.6),
 
-          backgroundColor: MaterialStateProperty.all(kred.withOpacity(0.6),
+        ),
+        ),
+        ),
 
-        ),
-        ),
-        ),
         Container(
           margin: EdgeInsets.only(top: 22.5, right: 22.5, left: 22.5),
           child: TextField(
@@ -516,4 +542,105 @@ class _UserProfileState extends State<UserProfile> {
       ],
     );
   }
+
+  Future<void> confirmPayment() async {
+    try {
+      // 3. display the payment sheet.
+      await Stripe.instance.presentPaymentSheet();
+
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Payment succesfully completed'),
+        ),
+      );
+    } on Exception catch (e) {
+      if (e is StripeException) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error from Stripe: ${e.error.localizedMessage}'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Unforeseen error: ${e}'),
+          ),
+        );
+      }
+    }
+}
+
+
+  Future paymentOnline() async {
+    print("clicked");
+    var userGetURL = Uri.parse("https://us-central1-binnazirfoundation.cloudfunctions.net/stripepayment");
+
+    var response = await http.get(userGetURL,
+
+    );
+
+
+    print("paymentResponse ${response.body}");
+
+    paymentIntentData =  jsonDecode(response.body);
+
+    // create some billingdetails
+    final billingDetails = BillingDetails(
+      email: 'email@stripe.com',
+      phone: '+48888000888',
+      address: Address(
+        city: 'Houston',
+        country: 'US',
+        line1: '1459  Circle Drive',
+        line2: '',
+        state: 'Texas',
+        postalCode: '77063',
+      ),
+    ); //
+
+    await Stripe.instance.initPaymentSheet(paymentSheetParameters: SetupPaymentSheetParameters(
+
+
+        paymentIntentClientSecret: paymentIntentData['paymentIntent'],
+        applePay: true,
+        googlePay: true,
+        style: ThemeMode.light,
+        merchantCountryCode: 'US',
+        merchantDisplayName: 'AK'
+
+
+    ));
+    // setState(() {
+    //
+    // });
+
+    confirmPayment();
+
+  }
+
+  Future displaySheet()async {
+
+    try{
+
+
+      await Stripe.instance.presentPaymentSheet(
+
+        parameters: PresentPaymentSheetParameters(clientSecret: paymentIntentData['clientSecret']), );
+
+    // await confirmPayment();
+
+      setState(() {
+        paymentIntentData = null;
+      });
+
+      Get.snackbar("Updated", "Payment");
+
+    }catch(e){
+              print("error $e");
+    }
+
+  }
+
+
 }

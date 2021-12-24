@@ -84,8 +84,9 @@ class VolunteerModel {
   String email;
   String password;
   String status;
+  String pay;
 
-  VolunteerModel({this.id, this.name, this.country,this.password,this.email,this.status,this.number});
+  VolunteerModel({this.id, this.name, this.country,this.password,this.email,this.status,this.number,this.pay});
 
   fromJson(Map<String, dynamic> json) {
     return VolunteerModel(
@@ -96,6 +97,7 @@ class VolunteerModel {
       email : json['email'],
       status : json['status'],
       number : json['number'],
+      pay: json['pay']
     );
 
   }
@@ -109,6 +111,7 @@ class VolunteerModel {
     data['status'] = this.status;
     data['number'] = this.number;
     data['country'] = this.country;
+    data['pay']=this.pay;
     return data;
   }
 }

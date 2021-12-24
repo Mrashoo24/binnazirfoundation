@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:binnazirfoundation/components/model.dart';
-import 'package:binnazirfoundation/components/pdfview.dart';
-import 'package:binnazirfoundation/login.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +10,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdfdownload/pdfdownload.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:php_serializer/php_serializer.dart';
@@ -58,6 +55,7 @@ class _ListofCasesState extends State<ListofCases> {
 
   // function download pdf file
   Future<bool> savePdf(String url, String fileName) async {
+
     print("url $url");
     try {
       setState(() {
@@ -200,7 +198,7 @@ class _ListofCasesState extends State<ListofCases> {
                 width: 100,
                 child: Row(
                   children: [
-                    IconButton(icon:Icon(Icons.more_vert), onPressed: () {
+                widget.urgentcase.name == "Zakat" || widget.urgentcase.name == "Sadqa" ? SizedBox() :    IconButton(icon:Icon(Icons.more_vert), onPressed: () {
                       final RelativeRect position =
                       buttonMenuPosition(context);
                       showMenu(context: context, position: position, items: [
@@ -222,7 +220,7 @@ class _ListofCasesState extends State<ListofCases> {
                       ]);
                     },),
 
-                    IconButton(icon: fav == true ? Icon(FontAwesomeIcons.solidHeart,color: kred,): Icon(FontAwesomeIcons.heart,), onPressed: () async {
+                    widget.urgentcase.name == "Zakat" || widget.urgentcase.name == "Sadqa" ? SizedBox() :    IconButton(icon: fav == true ? Icon(FontAwesomeIcons.solidHeart,color: kred,): Icon(FontAwesomeIcons.heart,), onPressed: () async {
 
                       SharedPreferences pref = await SharedPreferences.getInstance();
 
@@ -269,7 +267,7 @@ class _ListofCasesState extends State<ListofCases> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold
                   )),
-              subtitle: Column(
+              subtitle: widget.urgentcase.name == "Zakat" || widget.urgentcase.name == "Sadqa" ? SizedBox() :  Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -282,7 +280,7 @@ class _ListofCasesState extends State<ListofCases> {
                 ],
               ),
             ),
-            Padding(
+            widget.urgentcase.name == "Zakat" || widget.urgentcase.name == "Sadqa" ? SizedBox() :    Padding(
               padding: const EdgeInsets.only(left: 15.0),
               child: Align(
                   alignment: Alignment.centerLeft,
@@ -298,7 +296,7 @@ class _ListofCasesState extends State<ListofCases> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
+                  widget.urgentcase.name == "Zakat" || widget.urgentcase.name == "Sadqa" ? SizedBox() :     Expanded(
                     child: LinearPercentIndicator(
                       // width: MediaQuery.of(context).size.width*0.4,
                       animation: true,
@@ -315,6 +313,7 @@ class _ListofCasesState extends State<ListofCases> {
                       style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all(kred)
                       ),
+
                       onPressed: () async {
 
                         Get.isSnackbarOpen ? Get.back() : Get.snackbar("How Much You Want to Donate?","",

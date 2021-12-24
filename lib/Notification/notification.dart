@@ -1,11 +1,9 @@
 import 'package:auto_animated/auto_animated.dart';
 import 'package:binnazirfoundation/Notification/notificationcard.dart';
-import 'package:binnazirfoundation/components/common.dart';
 import 'package:binnazirfoundation/components/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:line_awesome_icons/line_awesome_icons.dart';
 
 class NotifcationScreen extends StatefulWidget {
   const NotifcationScreen({Key key}) : super(key: key);
@@ -20,87 +18,81 @@ class _NotifcationScreenState extends State<NotifcationScreen> {
     return SafeArea(
         child: Scaffold(
             body: SingleChildScrollView(
-              child: FutureBuilder(
-                future: allapi.getNotifications(),
-                builder: (context, snapshot) {
+      child: FutureBuilder(
+          future: allapi.getNotifications(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return preloader;
+            }
 
+            if (snapshot.hasError) {
+              Fluttertoast.showToast(msg: "Something Went Wrong ");
+            }
 
-                  if(!snapshot.hasData){
+            List notifications = snapshot.requireData;
 
-                    return preloader;
+            return Padding(
+              padding: const EdgeInsets.all(kscafpadding),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 50,
+                    ),
+                    Text(
+                      "Important",
+                      style: TextStyle(
+                          color: kred,
+                          fontSize: 35,
+                          fontFamily: 'CentraleSansRegular'),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          "Notification",
+                          style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 32,
+                              fontFamily: 'CentraleSansRegular',
+                              fontWeight: FontWeight.w300),
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      height: 4,
+                      thickness: 2,
+                    ),
+                    Container(
+                        margin: EdgeInsets.only(top: 20),
+                        child: notifications.length == 0
+                            ? Text("No Notifications")
+                            : LiveList.options(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                options: options,
 
-                  }
-
-                  if(snapshot.hasError){
-
-                    Fluttertoast.showToast(msg: "Something Went Wrong ");
-
-                  }
-
-
-                  List notifications = snapshot.requireData ;
-
-
-                  return Padding(
-                    padding: const EdgeInsets.all(kscafpadding),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-
-                          SizedBox(height: 50,),
-
-                          Text(
-                            "Important",
-                            style: TextStyle(
-                                color: kred,
-                                fontSize: 35,
-                                fontFamily: 'CentraleSansRegular'),
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                "Notification",
-                                style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 32,
-                                    fontFamily: 'CentraleSansRegular',
-                                    fontWeight: FontWeight.w300),
-                              ),
-                            ],
-                          ),
-                          Divider(height: 4,thickness: 2,),
-                          Container(
-                            margin: EdgeInsets.only(top: 20),
-                            child:notifications.length == 0 ? Text("No Notifications") :  LiveList.options(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              options: options,
-
-                              // Like ListView.builder, but also includes animation property
-                              itemBuilder: (
+                                // Like ListView.builder, but also includes animation property
+                                itemBuilder: (
                                   BuildContext context,
                                   int index,
                                   Animation<double> animation,
-                                  ) {
+                                ) {
+                                  return animatedWidget(
+                                    animation,
+                                    NotificationCard(
+                                        notifications: notifications[index],
+                                        index: index,
+                                        notList: notifications),
+                                  );
+                                },
 
-                                return animatedWidget(animation, NotificationCard(notifications:notifications),);
-
-                              },
-
-                              scrollDirection: Axis.vertical,
-                              itemCount: notifications.length,
-                            )
-
-                          )
-                        ]
-                    ),
-                  );
-                }
-              ),
-            )
-        )
-    );
+                                scrollDirection: Axis.vertical,
+                                itemCount: notifications.length,
+                              ))
+                  ]),
+            );
+          }),
+    )));
   }
 }
