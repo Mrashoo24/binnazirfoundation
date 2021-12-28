@@ -8,13 +8,18 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
 
 class FavoriteCases extends StatefulWidget {
-  const FavoriteCases({Key key}) : super(key: key);
+  final String code,userid;
+  const FavoriteCases({Key key, this.code, this.userid}) : super(key: key);
 
   @override
   _FavoriteCasesState createState() => _FavoriteCasesState();
 }
 
 class _FavoriteCasesState extends State<FavoriteCases> {
+
+
+
+
   @override
   Widget build(BuildContext context) {
     allapi.getBelovedCases();
@@ -92,7 +97,7 @@ class _FavoriteCasesState extends State<FavoriteCases> {
                             int index,
                             Animation<double> animation,
                             ) {
-                          return animatedWidget(animation, ListofCases(urgentcase: urgentcaselist[index],),);
+                          return animatedWidget(animation, ListofCases(urgentcase: urgentcaselist[index],userid: widget.userid,),);
                         },
 
                         // Other properties correspond to the

@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class Cases extends StatefulWidget {
-  final String cat,catid;
-  const Cases({Key key, this.cat, this.catid}) : super(key: key);
+  final String cat,catid,userid;
+  const Cases({Key key, this.cat, this.catid, this.userid}) : super(key: key);
 
   @override
   _CasesState createState() => _CasesState();
@@ -51,7 +51,7 @@ class _CasesState extends State<Cases> {
                   int index,
                   Animation<double> animation,
                   ) {
-                return animatedWidget(animation, ListofCases(urgentcase: urgentcaselist[index],));
+                return animatedWidget(animation, ListofCases(urgentcase: urgentcaselist[index],userid: widget.userid,));
               },
 
               // Other properties correspond to the

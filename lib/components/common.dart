@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
@@ -15,13 +16,16 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:php_serializer/php_serializer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
+import 'api.dart';
 import 'constants.dart';
 
 class ListofCases extends StatefulWidget {
   final UrgentCasesModel urgentcase;
+  final String code,userid,uid;
 
-  const ListofCases({Key key, this.urgentcase}) : super(key: key);
+  const ListofCases({Key key, this.urgentcase, this.code, this.userid, this.uid}) : super(key: key);
 
   @override
   _ListofCasesState createState() => _ListofCasesState();
@@ -32,7 +36,7 @@ class _ListofCasesState extends State<ListofCases> {
 
   String selectedPrice = null;
   bool fav ;
-
+  Map<String,dynamic> paymentIntentData ;
 
 
   Dio dio = Dio();
@@ -137,6 +141,102 @@ class _ListofCasesState extends State<ListofCases> {
 
 
     return check;
+
+  }
+
+
+  Future paymentOnline(int amount) async {
+
+    print("clicked");
+
+
+    // create some billingdetails
+    final billingDetails = BillingDetails(
+      email: 'email@stripe.com',
+      phone: '+48888000888',
+      address: Address(
+        city: 'Houston',
+        country: 'US',
+        line1: '1459  Circle Drive',
+        line2: '',
+        state: 'Texas',
+        postalCode: '77063',
+      ),
+    ); //
+
+    var userGetURL = Uri.parse("https://api.stripe.com/v1/payment_intents");
+
+  var newamount = (amount*100).toString();
+
+    var response = await http.post(userGetURL,
+
+        body: {
+          'amount': newamount,
+          'currency': 'inr',
+          'payment_method_types[]':'card',
+          'description':"Donations by ${widget.userid}"
+        },
+
+        headers: {
+          'Authorization' : 'Bearer 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',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+
+    );
+
+    print("paymentResponse ${response.body}");
+
+    paymentIntentData =  jsonDecode(response.body);
+
+    await Stripe.instance.initPaymentSheet(
+
+        paymentSheetParameters: SetupPaymentSheetParameters(
+
+
+          paymentIntentClientSecret: paymentIntentData['client_secret'],
+          applePay: true,
+          googlePay: true,
+          style: ThemeMode.light,
+          // merchantCountryCode: 'US',
+          merchantDisplayName: 'Nazir Care Foundation',
+          // billingDetails: billingDetails,
+          // customerId: paymentIntentData['customer'],
+          // customerEphemeralKeySecret: paymentIntentData['ephemeralKey']
+
+        ));
+
+    await  displaySheet(newamount);
+
+  }
+
+  Future displaySheet(String amount)async {
+
+    try{
+
+
+      await Stripe.instance.presentPaymentSheet(
+
+          parameters: PresentPaymentSheetParameters(clientSecret: paymentIntentData['client_secret'],confirmPayment:true));
+
+      setState(() {
+
+        paymentIntentData = null;
+
+      });
+
+
+      Get.snackbar("Updated", "Payment");
+      print("Success");
+      var type = widget.urgentcase.name == 'Zakat' || widget.urgentcase.name == 'Sadqa' ? "causes" : "urgent";
+
+     await  AllApi().updatedonations(widget.urgentcase.id,widget.userid,amount,type);
+
+
+    } on StripeException catch(e){
+
+      Get.snackbar("Error", e.toString() );
+
+    }
 
   }
 
@@ -271,7 +371,7 @@ class _ListofCasesState extends State<ListofCases> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("\$${widget.urgentcase.amount}",
+                  Text("\₹${widget.urgentcase.amount}",
                       style: TextStyle(
                         fontFamily: "CentraleSansRegular",
                         fontSize: 15,
@@ -303,7 +403,7 @@ class _ListofCasesState extends State<ListofCases> {
                       lineHeight: 20.0,
                       animationDuration: 2500,
                       percent:percent,
-                      center: Text("\$ ${widget.urgentcase.raised}",style: TextStyle(color: kwhite,letterSpacing: 2),),
+                      center: Text("\₹ ${widget.urgentcase.raised}",style: TextStyle(color: kwhite,letterSpacing: 2),),
                       linearStrokeCap: LinearStrokeCap.roundAll ,
                       progressColor: kred ,
                     ),
@@ -381,7 +481,7 @@ class _ListofCasesState extends State<ListofCases> {
                                               color: Colors.black,
                                               fontFamily: "CentraleSansRegular"),
                                           decoration: InputDecoration(
-                                            prefixText: "\$",
+                                            prefixText: "\₹",
                                             hintText: 'Enter Price Manually',
                                             filled: true,
                                             fillColor: Colors.white.withOpacity(.4),
@@ -423,8 +523,8 @@ class _ListofCasesState extends State<ListofCases> {
                                          onPressed:  () async {
                                            print(selectedPrice);
 
-                                          launch("https://pmny.in/7IZKM0aaiTPX");
-
+                                          // launch("https://pmny.in/7IZKM0aaiTPX");
+                                          paymentOnline(int.parse(selectedPrice));
 
                                           // Get.to(PDFViewerFromUrl(url: "",));
                                         // await OpenFile.open("/data/user/0/com.an.binnazir.binnazirfoundation/app_flutter20211217_173921.pdf").catchError((e){print("error $e");});
@@ -474,7 +574,7 @@ class _ListofCasesState extends State<ListofCases> {
             padding: const EdgeInsets.symmetric(
                 horizontal: 12.0, vertical: 12),
             child: Text(
-              "\$$price",
+              "\₹$price",
               style: TextStyle(fontSize: 14),
             ),
           ),

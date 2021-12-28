@@ -1,22 +1,25 @@
 import 'dart:convert';
-
 import 'package:binnazirfoundation/components/model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'constants.dart';
 
 
 
 class AllApi {
 
+
   Future<List<UrgentCasesModel>> getUrgentCases () async {
+
 
   var userGetURL = Uri.parse("${URL}urgentcases.php");
 
+
   var response = await http.get(userGetURL);
 
+
   List list = json.decode(response.body);
+
   //
   // print(response.body);
 
@@ -34,6 +37,7 @@ class AllApi {
 
   }
 
+
   Future<List<UrgentCasesModel>> getCasesById (String catid) async {
 
     var userGetURL = Uri.parse("${URL}causes.php?id=$catid");
@@ -41,6 +45,7 @@ class AllApi {
     var response = await http.get(userGetURL);
 
     List list = json.decode(response.body);
+
     //
     // print(response.body);
 
@@ -52,11 +57,10 @@ class AllApi {
     //
     // print(phpDeserialize(a[0].image));
 
-
     return a;
-
-
   }
+
+
 
   Future<List<CategoryModel>> getCategory() async {
 
@@ -135,6 +139,7 @@ List decodedlist =    jsonDecode(pref.getStringList("caselist").toString());
   }
 
   Future getNotifications() async {
+
     SharedPreferences pref = await SharedPreferences.getInstance();
 
     //
@@ -163,6 +168,7 @@ List decodedlist =    jsonDecode(pref.getStringList("caselist").toString());
     body: {
      'number': volunteermodel.number,
       'status': volunteermodel.status,
+      'pay': volunteermodel.pay,
       'email': volunteermodel.email,
       'password':  volunteermodel.password,
       'country':  volunteermodel.country,
@@ -206,6 +212,7 @@ List decodedlist =    jsonDecode(pref.getStringList("caselist").toString());
 
   }
 
+
   Future updateToken(String id,String token) async {
     print("token $token");
     var userGetURL = Uri.parse("${URL}updatetoken.php?user=$id&token=$token");
@@ -224,7 +231,37 @@ List decodedlist =    jsonDecode(pref.getStringList("caselist").toString());
 
   }
 
+  Future updatepayment(String id) async {
 
+    var userGetURL = Uri.parse("${URL}statusupdate.php?id=$id");
+
+    var response = await http.get(userGetURL);
+
+    var list = json.decode(response.body);
+
+        print("Pyment Response ${list}${id}");
+
+
+    return list;
+
+
+  }
+
+  Future updatedonations(String cid,String vid,String amount,String type) async {
+
+    var userGetURL = Uri.parse("${URL}urgent-payment.php?id=$cid&volunteerid=$vid&currency=INR&amount=$amount&type=$type");
+
+    var response = await http.get(userGetURL);
+    print("Pyment UR: $userGetURL ");
+    var list = json.decode(response.body);
+
+    print("Pyment Response ${list} ");
+
+
+    return list;
+
+
+  }
 
 
 }

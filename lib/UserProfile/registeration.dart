@@ -1,5 +1,7 @@
 import 'package:binnazirfoundation/components/constants.dart';
 import 'package:binnazirfoundation/components/model.dart';
+import 'package:binnazirfoundation/login.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -267,45 +269,57 @@ class _RegisterationState extends State<Registeration> {
           ),
         ),
         payment
-            ? SizedBox() :   Container(
+            ? SizedBox() :   InkWell(
+          onTap: (){
+            showCurrencyPicker(
+              context: context,
+              showFlag: true,
+              showCurrencyName: true,
+              showCurrencyCode: true,
+              onSelect: (Currency currency) {
+                print('Select currency: ${currency.name}');
+                setState(() {
+                  country = currency.name;
+                });
+              },
+              favorite: ['INR'],
+            );
+          },
+              child: Container(
           margin: EdgeInsets.only(top: 22.5, right: 22.5, left: 22.5),
           child: TextField(
-            controller: countryController,
-            cursorColor: kblackcolor,
-            decoration: InputDecoration(
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                      color: kblackcolor.withOpacity(0.6), width: 3)),
-              disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                      color: kblackcolor.withOpacity(0.6), width: 3)),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                      color: kblackcolor.withOpacity(0.6), width: 3)),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: kred, width: 3)),
-              icon: Icon(
-                Icons.map,
-                color: kpurple,
+            enabled: false,
+              cursorColor: kblackcolor,
+              decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                        color: kblackcolor.withOpacity(0.6), width: 3)),
+                disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                        color: kblackcolor.withOpacity(0.6), width: 3)),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                        color: kblackcolor.withOpacity(0.6), width: 3)),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: kred, width: 3)),
+                icon: Icon(
+                  Icons.map,
+                  color: kpurple,
+                ),
+                contentPadding: EdgeInsets.all(11.25),
+                hintText: country == null ? "Country" : country,
+                hintStyle: TextStyle(
+                  color: Colors.black.withOpacity(0.4),
+                ),
               ),
-              contentPadding: EdgeInsets.all(11.25),
-              hintText: "Country",
-              hintStyle: TextStyle(
-                color: Colors.black.withOpacity(0.4),
-              ),
-            ),
-            style: TextStyle(color: kpurple),
-            onChanged: (value) {
-              setState(() {
-                country = value;
-              });
-            },
+              style: TextStyle(color: kpurple),
           ),
         ),
+            ),
         payment
             ? Container(
                 width: MediaQuery.of(context).size.width,
@@ -382,18 +396,23 @@ class _RegisterationState extends State<Registeration> {
                               country: country,
                               password: password,
                               email: email,
-                              status: "0",
+                              status: "1",
+                              pay:"0",
                               number: phone))
                           .then((value) async {
                         if (value == "User has been updated!") {
-                          Get.snackbar("Your Form is Submitted",
-                              "Please Pay the Monthly Membership Fee For More Info Contact Us");
 
-                           SharedPreferences pref = await SharedPreferences.getInstance();
-                            pref.setBool("payment", true);
-                          setState(() {
-                            payment = true;
-                          });
+
+                          Get.snackbar("Your Form is Submitted",
+                              "Login and Please Pay the Monthly Membership Fee For More Info Contact Us");
+
+                                Get.offAll(Login());
+                          //  SharedPreferences pref = await SharedPreferences.getInstance();
+                          //   pref.setBool("payment", true);
+                          // setState(() {
+                          //   payment = true;
+                          // });
+                          //
                         }
                         {
                           Fluttertoast.showToast(msg: "Something Went Wrong");

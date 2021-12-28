@@ -8,7 +8,8 @@ import 'package:line_awesome_icons/line_awesome_icons.dart';
 
 
 class ZakatCalculator extends StatefulWidget {
-  const ZakatCalculator({Key key}) : super(key: key);
+  final String code;
+  const ZakatCalculator({Key key, this.code}) : super(key: key);
 
   @override
   _ZakatCalculatorState createState() => _ZakatCalculatorState();

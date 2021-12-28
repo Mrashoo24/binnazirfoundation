@@ -54,7 +54,7 @@ void main() async {
 
   );
 
-  Stripe.publishableKey = "pk_test_51K9pBSSInPgXpYUdgzGFJk1usakCKEpLVKyTnWAtoey5m6YNmAfg2sRPJhbA15WO6FqrgrfttLyeOjDYWTHuYcEO00fZ294a4T";
+  Stripe.publishableKey = "pk_live_51K9pBSSInPgXpYUdR7ZOlKhn8JpEQiGLWxkywTFPQ6clBXy2Zj68FygbV9VT3mJW1LntSFCBKRrmJIGUuRwwjTw700zMb986RC";
 await Stripe.instance.applySettings();
   runApp(MyApp());
 }
@@ -70,16 +70,17 @@ class _MyAppState extends State<MyApp> {
   var isloggedin = false;
 
   var id = "null";
+  var uid = "null";
 
   Future getBoolValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Return bool
     bool boolValue = prefs.getBool('loggedin') ?? false;
     String id = prefs.getString("userid") ?? "null";
-
+    String uid = prefs.getString("uid") ?? "null";
     print("boolvalue $boolValue");
     print("id $id");
-    return [boolValue, id];
+    return [boolValue, id,uid];
   }
 
   @override
@@ -88,6 +89,7 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         isloggedin = value[0];
         id = value[1];
+        uid = value[2];
       });
     });
     super.initState();
@@ -137,11 +139,13 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.white,
         navigateRoute: id != "null"
             ? HomePage(
-                userId: id,
+                userId: id,uid:uid
+
               )
             : isloggedin
                 ? Login()
                 : StartSlider(),
+
       ),
     );
   }

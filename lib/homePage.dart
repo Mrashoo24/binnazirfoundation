@@ -16,9 +16,9 @@ import 'components/constants.dart';
 import 'main.dart';
 
 class HomePage extends StatefulWidget {
-  final String userId;
+  final String userId,code,uid;
 
-  const HomePage({Key key, this.userId}) : super(key: key);
+  const HomePage({Key key, this.userId, this.code, this.uid}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -94,12 +94,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     List<Widget> _children = [
       // Heart(),
-      Explore(userid: widget.userId),
-      FavoriteCases(),
+      Explore(userid: widget.userId,code:widget.code),
+      FavoriteCases(code:widget.code,userid: widget.userId),
       NotifcationScreen(),
-      UserProfile(userid: widget.userId),
+      UserProfile(userid: widget.userId,code:widget.code,uid:widget.uid),
       ContactUs(),
-      ZakatCalculator(),
+      ZakatCalculator(code:widget.code),
       AboutUs(),
     ];
 

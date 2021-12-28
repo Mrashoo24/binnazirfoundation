@@ -22,9 +22,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'categfories/category.dart';
 
 class Explore extends StatefulWidget {
-  final String userid;
+  final String userid,code;
 
-  const Explore({Key key, this.userid}) : super(key: key);
+  const Explore({Key key, this.userid, this.code}) : super(key: key);
   // Build animated item (helper for all examples)
 
 
@@ -182,7 +182,7 @@ String search ;
 
                         InkWell(
                           onTap: (){
-                            Get.to(CategoryPage(catList:catlist));
+                            Get.to(CategoryPage(catList:catlist,userid: widget.userid,));
                           },
                           child: Text(
                             "View All",
@@ -238,7 +238,7 @@ String search ;
                             int index,
                             Animation<double> animation,
                         ) {
-                          return animatedWidget(animation, ListofCases(urgentcase: search == null || search.toString().isBlank ? urgentcaselist[index] : urgentCases[index]));
+                          return animatedWidget(animation, ListofCases(urgentcase: search == null || search.toString().isBlank ? urgentcaselist[index] : urgentCases[index],userid:widget.userid));
                         },
 
                         // Other properties correspond to the
@@ -258,7 +258,7 @@ String search ;
   Widget buildCatCard2(String title , String img,String catid) {
     return InkWell(
       onTap: (){
-        Get.to(Cases(cat: title,catid:catid));
+        Get.to(Cases(cat: title,catid:catid,userid:widget.userid));
       },
       child: Card(
                         child: Container(

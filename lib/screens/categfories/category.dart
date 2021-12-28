@@ -8,9 +8,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class CategoryPage extends StatefulWidget {
-  final String catid;
+  final String catid,userid;
   final List<CategoryModel> catList;
-  const CategoryPage({Key key, this.catid, this.catList}) : super(key: key);
+  const CategoryPage({Key key, this.catid, this.catList, this.userid}) : super(key: key);
 
   @override
   _CategoryPageState createState() => _CategoryPageState();
@@ -38,7 +38,7 @@ class _CategoryPageState extends State<CategoryPage> {
     return InkWell(
       onTap: (){
 
-        Get.to(Cases(cat: title,catid:catid));
+        Get.to(Cases(cat: title,catid:catid,userid: widget.userid,));
 
       },
       child: Card(

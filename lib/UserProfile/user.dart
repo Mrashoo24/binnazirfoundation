@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:binnazirfoundation/UserProfile/registeration.dart';
+import 'package:binnazirfoundation/components/api.dart';
 import 'package:binnazirfoundation/components/constants.dart';
 import 'package:binnazirfoundation/components/model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,11 +14,15 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get_utils/src/extensions/string_extensions.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../homePage.dart';
+import '../login.dart';
+
 class UserProfile extends StatefulWidget {
-  final String userid;
-  const UserProfile({Key key, this.userid}) : super(key: key);
+  final String userid,code,uid;
+  const UserProfile({Key key, this.userid, this.code, this.uid}) : super(key: key);
 
   @override
   _UserProfileState createState() => _UserProfileState();
@@ -41,10 +47,28 @@ class _UserProfileState extends State<UserProfile> {
   String phone;
   String country;
 
+  //token
+  String token = '';
+
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+
+
+
+  void getToken(String uid) async {
+    token = (await firebaseMessaging.getToken());
+    await allapi.updateToken(uid, token);
+  }
+
+
+
+
+
+
+
 @override
   void initState() {
 
-  Stripe.publishableKey = "pk_test_51K9pBSSInPgXpYUdgzGFJk1usakCKEpLVKyTnWAtoey5m6YNmAfg2sRPJhbA15WO6FqrgrfttLyeOjDYWTHuYcEO00fZ294a4T";
+  Stripe.publishableKey = "pk_live_51K9pBSSInPgXpYUdR7ZOlKhn8JpEQiGLWxkywTFPQ6clBXy2Zj68FygbV9VT3mJW1LntSFCBKRrmJIGUuRwwjTw700zMb986RC";
 
 
   super.initState();
@@ -140,11 +164,21 @@ class _UserProfileState extends State<UserProfile> {
                     color: Colors.black.withOpacity(.4),
                     fontSize: 17,
                     fontFamily: "CentraleSansRegular")),
+            onChanged: (value) {
+              setState(() {
+                phone = value;
+              });
+            },
           ),
           SizedBox(
             height: 20,
           ),
           TextFormField(
+            onChanged: (value) {
+              setState(() {
+                password = value;
+              });
+            },
             obscureText: true,
             style: TextStyle(
                 color: Colors.black, fontFamily: "CentraleSansRegular"),
@@ -168,32 +202,71 @@ class _UserProfileState extends State<UserProfile> {
                     color: Colors.black.withOpacity(.4),
                     fontSize: 17,
                     fontFamily: "CentraleSansRegular")),
+
           ),
           SizedBox(
             height: 20,
           ),
-          Container(
-            width: 330,
-            height: 60,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              border: Border.all(color: kgreybg, width: 1),
-              gradient: LinearGradient(
-                stops: [0.1, 0.5],
-                colors: [
-                  Color(0xffffffff).withOpacity(0.8),
-                  kred,
-                ],
+          InkWell(
+            onTap: (){
+              if (phone == null || password == null) {
+                Get.snackbar("No User Found", "",
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: kred.withOpacity(0.4));
+              } else {
+
+                  allapi.getVolunteer(phone).then((value) async {
+                    print(value.length);
+
+                    if (value.length == 0) {
+                      Get.snackbar("No User Found", "",
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: kred.withOpacity(0.4));
+                    } else {
+                      var userPassword = value[0].password;
+
+                      if (userPassword == password) {
+                        SharedPreferences pref =
+                        await SharedPreferences.getInstance();
+
+                        await getToken(value[0].id);
+
+                        pref.setString("userid", phone);
+                        pref.setString("uid", value[0].id);
+                        Get.offAll(HomePage(
+                            userId: phone,uid:value[0].id));
+                      } else {
+                        Get.snackbar("Error", "Password Incorrect",
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: kred.withOpacity(0.4));
+                      }
+                    }
+                  });
+              }
+            },
+            child: Container(
+              width: 330,
+              height: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                border: Border.all(color: kgreybg, width: 1),
+                gradient: LinearGradient(
+                  stops: [0.1, 0.5],
+                  colors: [
+                    Color(0xffffffff).withOpacity(0.8),
+                    kred,
+                  ],
+                ),
               ),
-            ),
-            child: Center(
-              child: Text(
-                "Login",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: "CentraleSansRegular",
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
+              child: Center(
+                child: Text(
+                  "Login",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: "CentraleSansRegular",
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ),
@@ -280,7 +353,7 @@ class _UserProfileState extends State<UserProfile> {
 
           // launch("https://pmny.in/lrUxi6efvkST");
 
-paymentOnline();
+paymentOnline(vol[0]);
 
         }, child: Text("PAY NOW",style: TextStyle(fontSize: 10),),
 
@@ -498,7 +571,29 @@ paymentOnline();
             },
           ),
         ),
+        SizedBox(height: 10,),
+        Center(
+          child: Container(
+            width: Get.width * 0.5,
+            child: ElevatedButton(
+              onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              //Return bool
+               prefs.setBool('loggedin',false);
 
+               Get.offAll(Login());
+
+            }, child: Text("LOGUT",style: TextStyle(fontSize: 14),),
+
+
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(kgreybg.withOpacity(0.6),
+
+                ),
+              ),
+            ),
+          ),
+        ),
         // Container(
         //   width: MediaQuery.of(context).size.width,
         //   height: 60,
@@ -572,18 +667,9 @@ paymentOnline();
 }
 
 
-  Future paymentOnline() async {
+  Future paymentOnline(VolunteerModel vol) async {
     print("clicked");
-    var userGetURL = Uri.parse("https://us-central1-binnazirfoundation.cloudfunctions.net/stripepayment");
 
-    var response = await http.get(userGetURL,
-
-    );
-
-
-    print("paymentResponse ${response.body}");
-
-    paymentIntentData =  jsonDecode(response.body);
 
     // create some billingdetails
     final billingDetails = BillingDetails(
@@ -599,23 +685,47 @@ paymentOnline();
       ),
     ); //
 
-    await Stripe.instance.initPaymentSheet(paymentSheetParameters: SetupPaymentSheetParameters(
+    var userGetURL = Uri.parse("https://api.stripe.com/v1/payment_intents");
 
 
-        paymentIntentClientSecret: paymentIntentData['paymentIntent'],
-        applePay: true,
-        googlePay: true,
-        style: ThemeMode.light,
-        merchantCountryCode: 'US',
-        merchantDisplayName: 'AK'
+    var response = await http.post(userGetURL,
+
+      body: {
+          'amount': '100',
+          'currency': 'inr',
+          'payment_method_types[]':'card',
+          'description':"Donations by ${vol.email}"
+      },
+
+      headers: {
+      'Authorization' : 'Bearer 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',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+
+    );
+
+    print("paymentResponse ${response.body}");
+
+    paymentIntentData =  jsonDecode(response.body);
+
+    await Stripe.instance.initPaymentSheet(
+
+        paymentSheetParameters: SetupPaymentSheetParameters(
 
 
-    ));
-    // setState(() {
-    //
-    // });
+            paymentIntentClientSecret: paymentIntentData['client_secret'],
+            applePay: true,
+            googlePay: true,
+            style: ThemeMode.light,
+            // merchantCountryCode: 'US',
+            merchantDisplayName: 'Nazir Care Foundation',
+            // billingDetails: billingDetails,
+            // customerId: paymentIntentData['customer'],
+            // customerEphemeralKeySecret: paymentIntentData['ephemeralKey']
 
-    confirmPayment();
+        ));
+
+         await  displaySheet();
 
   }
 
@@ -626,7 +736,9 @@ paymentOnline();
 
       await Stripe.instance.presentPaymentSheet(
 
-        parameters: PresentPaymentSheetParameters(clientSecret: paymentIntentData['clientSecret']), );
+        parameters: PresentPaymentSheetParameters(clientSecret: paymentIntentData['client_secret'],confirmPayment:true));
+
+      // await Stripe.instance.confirmPaymentSheetPayment();
 
     // await confirmPayment();
 
@@ -634,10 +746,16 @@ paymentOnline();
         paymentIntentData = null;
       });
 
+      await AllApi().updatepayment(widget.uid);
       Get.snackbar("Updated", "Payment");
+      print("Success");
 
-    }catch(e){
-              print("error $e");
+
+
+    } on StripeException catch(e){
+
+      Get.snackbar("Error", e.toString() );
+
     }
 
   }
