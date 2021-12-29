@@ -23,6 +23,8 @@ var scafKey = GlobalKey<ScaffoldState>();
 const URL = "https://nazircare.com/mrzulf/api/";
 const imageURL = "https://nazircare.com/causes/";
 var allapi = AllApi();
+const ksKeys = "pk_live_51K9pBSSInPgXpYUdR7ZOlKhn8JpEQiGLWxkywTFPQ6clBXy2Zj68FygbV9VT3mJW1LntSFCBKRrmJIGUuRwwjTw700zMb986RC";
+const rskeys = "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";
 
 var preloader =Container(
 height: Get.height,

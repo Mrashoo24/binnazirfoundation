@@ -54,7 +54,7 @@ void main() async {
 
   );
 
-  Stripe.publishableKey = "pk_live_51K9pBSSInPgXpYUdR7ZOlKhn8JpEQiGLWxkywTFPQ6clBXy2Zj68FygbV9VT3mJW1LntSFCBKRrmJIGUuRwwjTw700zMb986RC";
+  Stripe.publishableKey = ksKeys;
 await Stripe.instance.applySettings();
   runApp(MyApp());
 }
