@@ -402,18 +402,20 @@ class _RegisterationState extends State<Registeration> {
                           .then((value) async {
                         if (value == "User has been updated!") {
 
-
-                          Get.snackbar("Your Form is Submitted",
-                              "Login and Please Pay the Monthly Membership Fee For More Info Contact Us");
-
                                 Get.offAll(Login());
+                                Get.snackbar("Your Form is Submitted",
+                                    "Login and Please Pay the Monthly Membership Fee For More Info Contact Us",
+                                    snackPosition: SnackPosition.BOTTOM
+
+                                );
+
                           //  SharedPreferences pref = await SharedPreferences.getInstance();
                           //   pref.setBool("payment", true);
                           // setState(() {
                           //   payment = true;
                           // });
                           //
-                        }
+                        }else
                         {
                           Fluttertoast.showToast(msg: "Something Went Wrong");
                         }

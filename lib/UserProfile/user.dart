@@ -691,10 +691,12 @@ paymentOnline(vol[0]);
     var response = await http.post(userGetURL,
 
       body: {
-          'amount': '100',
+
+          'amount': '38000',
           'currency': 'inr',
           'payment_method_types[]':'card',
           'description':"Donations by ${vol.email}"
+
       },
 
       headers: {

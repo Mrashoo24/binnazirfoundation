@@ -145,7 +145,7 @@ class _ListofCasesState extends State<ListofCases> {
   }
 
 
-  Future paymentOnline(int amount) async {
+  Future paymentOnline(int amount,String name) async {
 
     print("clicked");
 
@@ -174,7 +174,7 @@ class _ListofCasesState extends State<ListofCases> {
           'amount': newamount,
           'currency': 'inr',
           'payment_method_types[]':'card',
-          'description':"Donations by ${widget.userid}"
+          'description':"Donations by ${widget.userid} for $name"
         },
 
         headers: {
@@ -524,7 +524,7 @@ class _ListofCasesState extends State<ListofCases> {
                                            print(selectedPrice);
 
                                           // launch("https://pmny.in/7IZKM0aaiTPX");
-                                          paymentOnline(int.parse(selectedPrice));
+                                          paymentOnline(int.parse(selectedPrice),widget.urgentcase.name);
 
                                           // Get.to(PDFViewerFromUrl(url: "",));
                                         // await OpenFile.open("/data/user/0/com.an.binnazir.binnazirfoundation/app_flutter20211217_173921.pdf").catchError((e){print("error $e");});
